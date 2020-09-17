@@ -16,8 +16,15 @@ colnames(cars) <- c("buyingPrice",
                     "sizeOfLuggageBoot",
                     "safety",
                     "decision")
-#cars$decision = factor(cars$decision, labels = c("unacc", "acc", "good", "vgood"))
-###################################################################
+
+# Transformamos todas las variables y la clase a factor
+cars$buyingPrice <- as.factor(cars$buyingPrice)
+cars$maintenanceCost <- as.factor(cars$maintenanceCost)
+cars$numberOfDoors <- as.factor(cars$numberOfDoors)
+cars$numberOfPersons <- as.factor(cars$numberOfPersons)
+cars$sizeOfLuggageBoot <- as.factor(cars$sizeOfLuggageBoot)
+cars$safety <- as.factor(cars$safety)
+cars$decision <- as.factor(cars$decision)
 
 #se crea el conjunto de datos para entrenamiento
 training.index = createDataPartition(cars$decision, p = 0.7)$Resample1
@@ -28,10 +35,31 @@ test.set = cars[-training.index, ]
 
 #creacion del arbol
 tree = C5.0(decision ~ ., training.set)
-tree.rules = C5.0(x = training.set[, -8], y = training.set$decision, rules = T)
-tree.pred.class = predict(tree, test.set[,-8], type = "class")
-tree.pred.prob = predict(tree, test.set[,-8], type = "prob")
 
 
+
+# Obtenemos las reglas del arbol
+tree.rules = C5.0(x = training.set[, -7], y = training.set$decision, rules = T)
+
+# Las clases predecidas para el conjunto de prueba
+tree.pred.class = predict(tree, test.set[,-7], type = "class")
+
+# Las probabilidades para el conjunto de prueba
+tree.pred.prob = predict(tree, test.set[,-7], type = "prob")
+
+tree.pred.prob
+tree.pred.class
+
+# Matriz de confusion obtenida comparando las clases predichas y las originales
+# del conjunto de prueba
 conf.matrix.tree = confusionMatrix(table(test.set$decision, tree.pred.class))
+
+# Obtencion de valores importantes
 print(conf.matrix.tree)
+
+# Graficando el arbol
+plot(tree)
+
+# Resumen del arbol
+summary(tree)
+
