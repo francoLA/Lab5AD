@@ -36,8 +36,6 @@ test.set = cars[-training.index, ]
 #creacion del arbol
 tree = C5.0(decision ~ ., training.set)
 
-
-
 # Obtenemos las reglas del arbol
 tree.rules = C5.0(x = training.set[, -7], y = training.set$decision, rules = T)
 
@@ -62,4 +60,43 @@ plot(tree)
 
 # Resumen del arbol
 summary(tree)
+
+# Resumen reglas del arbol
+summary(tree.rules)
+
+
+
+############## VARIACION #################
+
+# Nuevo corte
+training.index.var = createDataPartition(cars$decision, p = 0.8)$Resample1
+
+# Conjunto de entrenamiento
+training.set.var = cars[training.index.var, ]
+
+#el resto de datos son de testing
+test.set.var = cars[-training.index.var, ]
+
+# Se obtiene el arbol
+tree = C5.0(decision ~ safety +
+                       buyingPrice +
+                       maintenanceCost +
+                       sizeOfLuggageBoot +
+                       numberOfPersons, training.set.var)
+
+
+# Se grfica el arbol
+plot(tree)
+
+# Se obtiene el resumen
+summary(tree)
+
+# Se obtenienen las clases predecidas
+tree.pred.class.var = predict(tree, test.set.var[,-7], type = "class")
+
+# Matriz de confusion obtenida comparando las clases predichas y las originales
+# del conjunto de prueba
+conf.matrix.tree.var = confusionMatrix(table(test.set.var$decision, tree.pred.class.var))
+
+conf.matrix.tree.var
 
